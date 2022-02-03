@@ -65,12 +65,31 @@
 
         
       </div>
-        <line-chart class="my-10" :colors="['orange']" :min="min" :max="max" :data="history.map(h => [h.date, parseFloat(h.priceUsd).toFixed(2)])" />  
+      <line-chart class="my-10" :colors="['orange']" :min="min" :max="max" :data="history.map(h => [h.date, parseFloat(h.priceUsd).toFixed(2)])" />  
+
+
+      <h3 class="text-xl my-10">Mejores Ofertas de Cambio</h3>
+      <table>
+        <tr v-for="m in markets" :key="`${m.exhangeId}-${m.priceUsd}`" class="border-b">
+          <td>
+            <b>{{ m.exchangeId }}</b>
+          </td>
+          <td> {{ m.priceUsd | dollar }} </td>
+          <td> {{ m.baseSymbol }} / {{ m.quoteSymbol }} </td>
+          <td>
+            <px-button v-if="!m.url" @custom-click="getWebsite(m)">
+              <slot> Obtener Link </slot>
+            </px-button>
+            <a v-else class="hover:underline text-green-600" target="_blanck">m.url</a>
+          </td>
+        </tr>
+      </table>
     </template>
   </div>
 </template>
 
 <script>
+import PxButton from '@/components/PxButton'
 import api from '@/api'
 
 export default {
@@ -80,7 +99,12 @@ export default {
     return {
       asset: {},
       history: [],
+      markets: []
     }
+  },
+
+  components: {
+    PxButton
   },
 
   created() {
@@ -108,14 +132,23 @@ export default {
   },
 
   methods: {
+    getWebsite (exchange) {
+      return api.getExchange(exchange.exchangeId)
+        .then(res => {
+          exchange.url = res.exchangeUrl
+          this.$set(exchange, 'url', res.exchangeUrl)
+        })
+    },
+    
     getCoin() {
       const id = this.$route.params.id
 
-      Promise.all([api.getAsset(id), api.getAssetHistory(id)]).then(
-        ([asset, history]) => {
+      Promise.all([api.getAsset(id), api.getAssetHistory(id), api.getMarkets(id)]).then(
+        ([asset, history, markets]) => {
           console.log(history)
           this.asset = asset
           this.history = history
+          this.markets = markets
         }
       )
     },
