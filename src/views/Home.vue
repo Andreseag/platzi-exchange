@@ -1,6 +1,7 @@
 <template>
   <div>
-    <px-assets-table :assets="assets" />
+    <bar-lodader :loading="isLoading" :color="'#68d391'" :size="100"></bar-lodader>
+    <px-assets-table v-if="!isLoading" :assets="assets" />
   </div>
 </template>
 
@@ -14,12 +15,17 @@ export default {
 
   data() {
     return {
+      isLoading: false,
       assets: [],
     }
   },
 
   created() {
-    api.getAssets().then((assets) => (this.assets = assets))
+    this.isLoading = true
+    api
+      .getAssets()
+      .then((assets) => (this.assets = assets))
+      .finally(() => (this.isLoading = false))
   },
 }
 </script>

@@ -62,7 +62,10 @@
 
           <span class="text-xl"></span>
         </div>
+
+        
       </div>
+        <line-chart class="my-10" :colors="['orange']" :min="min" :max="max" :data="history.map(h => [h.date, parseFloat(h.priceUsd).toFixed(2)])" />  
     </template>
   </div>
 </template>
@@ -87,19 +90,19 @@ export default {
   computed: {
     min() {
       return Math.min(
-        ...this.history.map(h => parseFloat(h.priceUsd).toFixed(2))
+        ...this.history.map((h) => parseFloat(h.priceUsd).toFixed(2))
       )
     },
 
     max() {
       return Math.max(
-        ...this.history.map(h => parseFloat(h.priceUsd).toFixed(2))
+        ...this.history.map((h) => parseFloat(h.priceUsd).toFixed(2))
       )
     },
 
     avg() {
       return Math.abs(
-        ...this.history.map(h => parseFloat(h.priceUsd).toFixed(2))
+        ...this.history.map((h) => parseFloat(h.priceUsd).toFixed(2))
       )
     },
   },
